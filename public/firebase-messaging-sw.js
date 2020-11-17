@@ -1,14 +1,10 @@
-// import app from 'firebase/app';
-// import firebaseConfig from '../src/firebaseConfig'
-// import firebaseConfig from '../src/firebaseConfig'
-// importScripts('../src/firebaseConfig.js');
-// importScripts('./firebaseConfig.js');
+/* eslint-disable no-restricted-globals */
+/* eslint-env serviceworker */
+/* global firebase */
 
 // Give the service worker access to Firebase Messaging.
 // Note that you can only use Firebase Messaging here, other Firebase libraries
 // are not available in the service worker.
-// importScripts('https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js');
-// importScripts('https://www.gstatic.com/firebasejs/7.16.0/firebase-messaging.js');
 importScripts('https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.0.0/firebase-messaging.js');
 

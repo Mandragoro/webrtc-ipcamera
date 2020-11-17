@@ -85,6 +85,7 @@ function App(props) {
       // spinnerService.hide("loading");
     });
     return () => { authListener.current(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // firebase.auth().onAuthStateChanged(function(user) {

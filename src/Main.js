@@ -121,6 +121,8 @@ function Main(props) {
 
   const classes = useStyles();
 
+  const db = firebase.firestore();
+
   const [currentRoom, setCurrentRoom] = React.useState({});
   const [open, setOpen] = React.useState(false);
   const [buttonsDisabled, setButtonsDisabled] = React.useState({
@@ -151,7 +153,7 @@ function Main(props) {
 
   React.useEffect(() => {
     getRooms();
-    getMessagingToken() //TODO: send device name to store it along messagin id
+    getMessagingToken()
     onMessage(handlePushNotificationArrived);
     return () => {
       clearTimeout(pushTimeout.current);
@@ -288,7 +290,7 @@ function Main(props) {
 
   const addIceCandidateListener = async(peerConnection, docId) => {
     if (peerConnections.current.length > 0) {
-      const db = firebase.firestore();
+      // const db = firebase.firestore();
       // const roomRef = await db.collection(`users/${uid}/rooms`).doc(roomIdRef.current);
       // const callerCandidatesCollection = roomRef.collection('callerCandidates');
       const callerCandidatesCollection = await db.collection(`users/${uid}/rooms/${roomIdRef.current}/cameras/${docId}/callerCandidates`);
@@ -304,9 +306,9 @@ function Main(props) {
     }
   }
 
-  const sendPushNotifications = async() => {
+  const sendPushNotifications = async(title, body) => {
     console.log('Sending push notifications to all registered devices...')
-    const db = firebase.firestore();
+    // const db = firebase.firestore();
     const tokensSnapshot = await db.collection(`users`).doc(uid).get();
     const tokens = tokensSnapshot.data().messagingIds;
     const errorTokenIndexes = [];
@@ -323,8 +325,8 @@ function Main(props) {
       // icon: 512.png
       const bodyParameters = {
         "data": {
-          "title": "Incoming call...",
-          "body": "Start webrtc chat",
+          "title": title?title:"Incoming call...",
+          "body": body?body:"Start webrtc chat",
           "icon": "./logo192.png",
           "badge": "./logo192.png",
           // "click_action": "https://google.com"
@@ -367,7 +369,7 @@ function Main(props) {
   async function createRoom() {
     setButtonsDisabled((current) => ({...current, createBtn: true, joinBtn: true}));
     setVideoEnabled(() => ({local: false, remote: true}))
-    const db = firebase.firestore();
+    // const db = firebase.firestore();
     const roomRef = await db.collection(`users/${uid}/rooms`).doc();
   
     console.log('Create PeerConnection with configuration: ', configuration);
@@ -494,7 +496,7 @@ function Main(props) {
   }
 
   async function getRooms() {
-    const db = firebase.firestore();
+    // const db = firebase.firestore();
     const roomRef = db.collection(`users/${uid}/rooms`);
     const roomSnapshot = await roomRef.get();
     let idsArr = [];
@@ -509,7 +511,7 @@ function Main(props) {
   }
 
   async function isOngoingCall() {
-    const db = firebase.firestore();
+    // const db = firebase.firestore();
     const roomRef = db.collection(`users/${uid}/rooms`);
     const roomSnapshot = await roomRef.get();
     roomSnapshot.forEach(async doc => {
@@ -525,7 +527,7 @@ function Main(props) {
       message:`You are the callee, Room ID: `
     }))
     setRoomId(roomId);
-    const db = firebase.firestore();
+    // const db = firebase.firestore();
     const roomRef = db.collection(`users/${uid}/rooms`).doc(`${roomId}`);
     const roomSnapshot = await roomRef.get();
     console.log('Got room:', roomSnapshot.exists);
@@ -726,7 +728,7 @@ function Main(props) {
     console.log('roomId: ',roomIdRef.current)
     let tmpRoomId = roomId ? roomId : roomIdRef.current;
     if (tmpRoomId) {
-      const db = firebase.firestore();
+      // const db = firebase.firestore();
       const roomRef = db.collection(`users/${uid}/rooms`).doc(tmpRoomId);
 
       // if (videoEnabled.local && cameraId.current) {
@@ -759,6 +761,7 @@ function Main(props) {
           await camera.ref.delete();
         });
         await roomRef.delete();
+        sendPushNotifications("Hang Up", "The call has ended...");
       // }
     }
   }
