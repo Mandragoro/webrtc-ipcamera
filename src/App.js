@@ -19,18 +19,34 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    
     '& > div': {
       width: '100%',
-      maxWidth: 400,
+      maxWidth: '80%',
       padding: 50,
-      height: '100%',
+      height: '30%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
       textAlign: 'center',
     },
+    '& > div:last-child': {
+      width: '100%',
+      maxWidth: 400,
+      padding: 50,
+      height: '30%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+    },
+  },
+  title: {
+    width: '80%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    textAlign: 'center',
   },
   textFieldsContainer: {
     width: '100%',
@@ -46,6 +62,9 @@ const useStyles = makeStyles({
   buttonContainer: {
     width: '100%',
   },
+  errorMessage: {
+    color: '#db7093',
+  }
 });
 
 function App(props) {
@@ -62,6 +81,8 @@ function App(props) {
   const [authUser, setAuthUser] = React.useState(null);
   const [redirectToReferrer, setRedirectToReferrer] = React.useState(false);
   const [loginCheck, setLoginCheck] = React.useState(false);
+  const [showSignUp, setShowSignUp] = React.useState(false);
+  const [loginError, setLoginError] = React.useState(null);
 
   let authListener = React.useRef(null);
 
@@ -108,6 +129,11 @@ function App(props) {
     setCredentials((current) => ({...current, [event.target.name]: event.target.value}))
   }
 
+  const handleShowSignUp = (event) => {
+    setLoginError(null);
+    setShowSignUp((current) => (!current))
+  }
+
   const handleLogin = (firebase) => {
     console.log("handleLogin")
     // firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password)
@@ -120,12 +146,31 @@ function App(props) {
       .then(data => {
         console.log("SIGNED IN!!!", data);
         // spinnerService.hide("loading");
+        loginError && setLoginError(null);
         setAuthUser(() => data);
         setRedirectToReferrer(() => true);
       })
       .catch(error => {
         console.log("SIGN IN ERROR!!!", error);
-        // setLoginError(error);
+        setLoginError(error.message);
+        // spinnerService.hide("loading");
+      });
+  }
+
+  const handleSignUp = () => {
+    console.log('sign up')
+    firebase
+      .doCreateUserWithEmailAndPassword(credentials.email, credentials.password)
+      .then(data => {
+        console.log("SIGNED IN!!!", data);
+        // spinnerService.hide("loading");
+        loginError && setLoginError(null);
+        setAuthUser(() => data);
+        setRedirectToReferrer(() => true);
+      })
+      .catch(error => {
+        console.log("CREATE USER ERROR!!!", error);
+        setLoginError(error.message);
         // spinnerService.hide("loading");
       });
   }
@@ -138,26 +183,59 @@ function App(props) {
           <React.Fragment>
             {authUser ?
               <header className="App-header">
-              {/* <img src={logo} className="App-logo" alt="logo" /> */}
-              <Typography component='p' variant="h3" className={classes.title} color="textPrimary" gutterBottom>
-                WebRTC
-              </Typography>
-              <Main uid={authUser.uid} getMessagingToken={getMessagingToken} onMessage={onMessage} />
-            </header>
+                <Typography component='p' variant="h3" className={classes.title} color="textPrimary" gutterBottom>
+                  WebRTC Android "IP Camera"
+                </Typography>
+                <Main uid={authUser.uid} getMessagingToken={getMessagingToken} onMessage={onMessage} />
+              </header>
             :
-            <div className={classes.loginContainer}>
-              <div>
-                <div className={classes.textFieldsContainer}>
-                  <TextField variant='outlined' fullWidth id="standard-basic" label="Email" name='email' type='text' value={credentials.email} onChange={handleChange} />
-                  <TextField variant='outlined' fullWidth id="standard-basic" label="Password" name='password' type='password' value={credentials.password} onChange={handleChange} />
+              <React.Fragment>
+                <div className={classes.loginContainer}>
+
+                  <div>
+                  <Typography component='p' variant="h3" className={classes.title} color="textPrimary" gutterBottom>
+                    WebRTC Android "IP Camera"
+                  </Typography>
+                  </div>
+
+                  <div>
+                    <div className={classes.textFieldsContainer}>
+                      <TextField variant='outlined' fullWidth id="standard-basic" label="Email" name='email' type='text' value={credentials.email} onChange={handleChange} />
+                      <TextField variant='outlined' fullWidth id="standard-basic" label="Password" name='password' type='password' value={credentials.password} onChange={handleChange} />
+                    </div>
+                    <div>
+                    {loginError && 
+                    <Typography component='p' variant="subtitle2" className={classes.errorMessage} color="textPrimary" gutterBottom>
+                      {loginError}
+                    </Typography>}
+                    </div>
+                    <div className={classes.buttonContainer}>
+                      {showSignUp ?
+                        <Button fullWidth variant='contained' color='primary' onClick={()=>handleSignUp(firebase)} >
+                          signup
+                        </Button>
+                      :
+                        <Button fullWidth variant='contained' color='primary' onClick={()=>handleLogin(firebase)} >
+                          login
+                        </Button>
+                      }
+                    </div>
+                  </div>
+
+                  {showSignUp ?
+                    <Button variant='text' color='primary' onClick={handleShowSignUp} >
+                      Cancel
+                    </Button>
+                  :
+                    // <Button variant='text' color='primary' onClick={handleShowSignUp} >
+                    //   Create an account
+                    // </Button>
+                    null
+                  }
+                  
                 </div>
-                <div className={classes.buttonContainer}>
-                  <Button fullWidth variant='contained' color='primary' onClick={()=>handleLogin(firebase)} >
-                    login
-                  </Button>
-                </div>
-              </div>
-            </div>}
+              </React.Fragment>
+            }
           </React.Fragment>
         );}}
       </FirebaseContext.Consumer>

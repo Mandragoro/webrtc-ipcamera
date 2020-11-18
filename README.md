@@ -8,7 +8,26 @@ The Idea here is to use an old Android device as a remote IP Camera using WebRTC
 When the client hangs up, the room is deleted and the remote devices close the video feed on the disconected event.
 
 ### Get started...
-First create a file called "firebaseConfig.js" under "/src", and fill it with your own project data, you can find your project data on your firebase console.
+
+First enable Email/Password sign-in method in the Firebase console and add your user and password.
+
+Edit the Firestore rules so only your new user can read and write:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+```
+
+Create a file called "firebaseConfig.js" under "/src", and fill it with your own project data, you can find your project data on your firebase console.
 
 ```javascript
 // Your web app's Firebase configuration
