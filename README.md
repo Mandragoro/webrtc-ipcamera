@@ -9,9 +9,9 @@ When the client hangs up, the room is deleted and the remote devices close the v
 
 ### Get started...
 
-First enable Email/Password sign-in method in the Firebase console and add your user and password.
+- First enable Email/Password sign-in method in the Firebase console and add your user and password.
 
-Edit the Firestore rules so only your new user can read and write:
+- Edit the Firestore rules so only your new user can read and write:
 
 ```javascript
 rules_version = '2';
@@ -26,8 +26,9 @@ service cloud.firestore {
   }
 }
 ```
+- Add a new collection called 'users' to firestore and inside add a document with your user UID. 
 
-Create a file called "firebaseConfig.js" under "/src", and fill it with your own project data, you can find your project data on your firebase console.
+- Create a file called "firebaseConfig.js" under "/src", and fill it with your own project data. You can find your project data on your firebase console.
 
 ```javascript
 // Your web app's Firebase configuration
@@ -46,17 +47,17 @@ export const SERVER_TOKEN ='....';
 export default firebaseConfig;
 ```
 
-Run the build comand on your console: 
+- Run the build comand on your console: 
 ```javascript
 $ npm run build
 ```
 
-Serve the build folder: 
+- Serve the build folder: 
 ```javascript
 $ serve -s build
 ```
 
-Now you can go to localhost:5000 or the specified port and install the pwa.
+- Now you can go to localhost:5000 or the specified port and install the pwa.
 
 ### NOTE:
 This app uses default STUN servers from Google and no TURN servers, so if you are behind a double NAT situation with your ISP, the connection may fail.
